@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>799208153346-v7cbnvjg3vga431ob2rlifd940t35o8g.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.799208153346-v7cbnvjg3vga431ob2rlifd940t35o8g</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBZBKLEE0BzRzS03xkGcth8JjlaViVREik</string>
+	<key>GCM_SENDER_ID</key>
+	<string>799208153346</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.keithel</string>
+	<key>PROJECT_ID</key>
+	<string>keithel-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>keithel-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:799208153346:ios:0ccbc330c00bfdb9e0a21b</string>
+</dict>
+</plist>

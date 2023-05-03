@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "799208153346",
+    "project_id": "keithel-app",
+    "storage_bucket": "keithel-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:799208153346:android:85ad1b4249292b74e0a21b",
+        "android_client_info": {
+          "package_name": "com.example.keithel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "799208153346-64m20oi78omp48j9vbdbr04fm3ha179c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOQMyPSuSL8ENzJ8-6sWuRkHAAClQvUBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "799208153346-64m20oi78omp48j9vbdbr04fm3ha179c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
