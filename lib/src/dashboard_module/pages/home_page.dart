@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:keithel/src/core/constants/colors.dart';
-import 'package:keithel/src/core/constants/image_strings.dart';
 import 'package:keithel/src/core/constants/sizes.dart';
 import 'package:keithel/src/core/constants/text_strings.dart';
+import 'package:keithel/src/core/router/app_route.gr.dart';
 import 'package:keithel/src/dashboard_module/widgets/product_card.dart';
 import 'package:keithel/src/sidebar_module/pages/sidebar.dart';
 import 'package:badges/badges.dart' as badges;
 
-import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../user_module/logic/user_model.dart';
@@ -39,6 +39,8 @@ class _HomePageState extends State<HomePage> {
     // Colors.blue,
     // Colors.amber,
   ];
+
+  final _db = FirebaseFirestore.instance;
 
   int _currentPage = 0;
   final _pageController = PageController(initialPage: 0);
@@ -95,7 +97,9 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.router.push(CartRoute(user: widget.user));
+                      },
                       icon: const Icon(
                         Icons.shopping_cart,
                         size: 20.0,
@@ -132,8 +136,7 @@ class _HomePageState extends State<HomePage> {
         drawer: SideBarPage(user: widget.user),
         body: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(
-                gDefaultSize - 10, 0, gDefaultSize - 10, gDefaultSize - 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 Row(
@@ -159,29 +162,27 @@ class _HomePageState extends State<HomePage> {
                             size: 20.0,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 3,
+                            vertical: 4,
                           ),
-                          suffixIcon: Padding(
-                            padding:
-                                const EdgeInsetsDirectional.only(end: 15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(
+                          suffixIcon: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
                                   Icons.mic,
                                   size: 20.0,
                                 ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Icon(
+                                onPressed: () {},
+                              ),
+                              IconButton(
+                                icon: const Icon(
                                   Icons.camera_alt,
                                   size: 20.0,
                                 ),
-                              ],
-                            ),
+                                onPressed: () {},
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -206,8 +207,8 @@ class _HomePageState extends State<HomePage> {
                           color: colors[index],
                           height: 170,
                           width: 200,
-                          child: Lottie.network(
-                              'https://assets3.lottiefiles.com/packages/lf20_5tkzkblw.json'),
+                          // child: Lottie.network(
+                          //     'https://assets3.lottiefiles.com/packages/lf20_5tkzkblw.json'),
                         ),
                       );
                     },
@@ -218,8 +219,8 @@ class _HomePageState extends State<HomePage> {
                   controller: _pageController,
                   count: 3,
                   effect: const ExpandingDotsEffect(
-                    dotHeight: 8,
-                    dotWidth: 8,
+                    dotHeight: 5,
+                    dotWidth: 5,
                     activeDotColor: gBlackColor,
                     expansionFactor: 2,
                   ),
@@ -228,200 +229,357 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 10),
 
                 // Recently Viewed
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Recently Viewed',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        // Get.to(() => const TestPage());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Show All',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const Icon(Icons.arrow_right),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                StreamBuilder(
+                    stream: _db
+                        .collection("products")
+                        .where("is_recently_viewed", isEqualTo: true)
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.hasError) {
+                        print('Something went wrong');
+                      }
+
+                      final List recentlyViewed = [];
+                      if (snapshot.hasData) {
+                        snapshot.data!.docs.map(
+                            (QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                          Map a = e.data();
+                          recentlyViewed.add(a);
+                        }).toList();
+                      }
+                      return Visibility(
+                        visible: recentlyViewed.isNotEmpty,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Recently Viewed',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                context.router.push(
+                                    ShowAllRoute(itemList: recentlyViewed));
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Show All',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const Icon(Icons.arrow_right),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }),
                 const SizedBox(height: 10),
 
                 // Recently Viewed Images ListView
-                SizedBox(
-                  height: 190,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Denim Jacket',
-                          productPrice: '2999.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Hoodie',
-                          productPrice: '699.00',
-                        ),
-                        // ProductCard(
-                        //   productImagePath: logoPath,
-                        //   productName: 'Formal Pant',
-                        //   productPrice: '1099.00',
-                        // ),
-                      ],
-                    ),
-                  ),
+                StreamBuilder(
+                  stream: _db
+                      .collection("products")
+                      .where("is_recently_viewed", isEqualTo: true)
+                      .snapshots(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                          snapshot) {
+                    if (snapshot.hasError) {
+                      print('Something went wrong');
+                    }
+
+                    final List recentlyViewed = [];
+                    if (snapshot.hasData) {
+                      // snapshot.data!.docs
+                      //     .map((QueryDocumentSnapshot<Map<String, dynamic>>
+                      //             e) =>
+                      //         log(e.data().toString()))
+                      //     .toList();
+                      snapshot.data!.docs
+                          .map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                        Map a = e.data();
+                        // log(a.toString());
+                        recentlyViewed.add(a);
+                      }).toList();
+                    }
+
+                    return recentlyViewed.isNotEmpty
+                        ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              height: 190,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: recentlyViewed.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                      onTap: () {
+                                        context.router.push(ProductRoute());
+                                      },
+                                      child: ProductCard(
+                                        productImagePath: recentlyViewed[index]
+                                            ["product_image_path"],
+                                        productName: recentlyViewed[index]
+                                            ["product_name"],
+                                        productPrice: recentlyViewed[index]
+                                                ["product_price"]
+                                            .toString(),
+                                        productId: recentlyViewed[index]
+                                            ["product_id"],
+                                        isFavorite: recentlyViewed[index]
+                                            ["is_favorite"],
+                                      ));
+                                },
+                              ),
+                            ),
+                          )
+                        : Container();
+                  },
                 ),
+
                 const SizedBox(height: 10),
 
                 // New Arrivals
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'New Arrivals',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        // Get.to(() => const TestPage());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Show All',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const Icon(Icons.arrow_right),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                StreamBuilder(
+                    stream: _db
+                        .collection("products")
+                        .where("is_new_arrival", isEqualTo: true)
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.hasError) {
+                        print('Something went wrong');
+                      }
+
+                      final List newArrivals = [];
+                      if (snapshot.hasData) {
+                        snapshot.data!.docs.map(
+                            (QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                          Map a = e.data();
+                          newArrivals.add(a);
+                        }).toList();
+                      }
+                      return Visibility(
+                        visible: newArrivals.isNotEmpty,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'New Arrivals',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                context.router
+                                    .push(ShowAllRoute(itemList: newArrivals));
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Show All',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const Icon(Icons.arrow_right),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }),
                 const SizedBox(height: 10),
 
                 // New Arrivals Images ListView
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    height: 190,
-                    child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Denim Jacket',
-                          productPrice: '2999.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Hoodie',
-                          productPrice: '699.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Formal Pant',
-                          productPrice: '1099.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Hoodie',
-                          productPrice: '699.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Formal Pant',
-                          productPrice: '1099.00',
-                        ),
-                      ],
-                    ),
-                  ),
+                StreamBuilder(
+                  stream: _db
+                      .collection("products")
+                      .where("is_new_arrival", isEqualTo: true)
+                      .snapshots(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                          snapshot) {
+                    if (snapshot.hasError) {
+                      print('Something went wrong');
+                    }
+
+                    final List newArrivals = [];
+                    if (snapshot.hasData) {
+                      // snapshot.data!.docs
+                      //     .map((QueryDocumentSnapshot<Map<String, dynamic>>
+                      //             e) =>
+                      //         log(e.data().toString()))
+                      //     .toList();
+                      snapshot.data!.docs
+                          .map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                        Map a = e.data();
+
+                        newArrivals.add(a);
+                      }).toList();
+                    }
+
+                    return newArrivals.isNotEmpty
+                        ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              height: 190,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: newArrivals.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                      onTap: () {
+                                        context.router.push(ProductRoute());
+                                      },
+                                      child: ProductCard(
+                                        productImagePath: newArrivals[index]
+                                            ["product_image_path"],
+                                        productName: newArrivals[index]
+                                            ["product_name"],
+                                        productPrice: newArrivals[index]
+                                                ["product_price"]
+                                            .toString(),
+                                        productId: newArrivals[index]
+                                            ["product_id"],
+                                        isFavorite: newArrivals[index]
+                                            ["is_favorite"],
+                                      ));
+                                },
+                              ),
+                            ),
+                          )
+                        : Container();
+                  },
                 ),
 
                 const SizedBox(height: 10),
 
                 // Top Trends
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Top Trends',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        // Get.to(() => const TestPage());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Show All',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const Icon(Icons.arrow_right),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                StreamBuilder(
+                    stream: _db
+                        .collection("products")
+                        .where("is_top_trend", isEqualTo: true)
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.hasError) {
+                        print('Something went wrong');
+                      }
+
+                      final List topTrends = [];
+                      if (snapshot.hasData) {
+                        snapshot.data!.docs.map(
+                            (QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                          Map a = e.data();
+                          topTrends.add(a);
+                        }).toList();
+                      }
+                      return Visibility(
+                        visible: topTrends.isNotEmpty,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Top Trends',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                context.router
+                                    .push(ShowAllRoute(itemList: topTrends));
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Show All',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const Icon(Icons.arrow_right),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }),
                 const SizedBox(height: 10),
 
                 // Top Trends Images ListView
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    height: 190,
-                    child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Denim Jacket',
-                          productPrice: '2999.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Hoodie',
-                          productPrice: '699.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Formal Pant',
-                          productPrice: '1099.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Denim Jacket',
-                          productPrice: '2999.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Hoodie',
-                          productPrice: '699.00',
-                        ),
-                        ProductCard(
-                          productImagePath: logoPath,
-                          productName: 'Formal Pant',
-                          productPrice: '1099.00',
-                        ),
-                      ],
-                    ),
-                  ),
+                StreamBuilder(
+                  stream: _db
+                      .collection("products")
+                      .where("is_top_trend", isEqualTo: true)
+                      .snapshots(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                          snapshot) {
+                    if (snapshot.hasError) {
+                      print('Something went wrong');
+                    }
+
+                    final List topTrends = [];
+                    if (snapshot.hasData) {
+                      // snapshot.data!.docs
+                      //     .map((QueryDocumentSnapshot<Map<String, dynamic>>
+                      //             e) =>
+                      //         log(e.data().toString()))
+                      //     .toList();
+                      snapshot.data!.docs
+                          .map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                        Map a = e.data();
+                        topTrends.add(a);
+                      }).toList();
+                    }
+
+                    return topTrends.isNotEmpty
+                        ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              height: 190,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: topTrends.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                      onTap: () {
+                                        context.router.push(ProductRoute());
+                                      },
+                                      child: ProductCard(
+                                        productImagePath: topTrends[index]
+                                            ["product_image_path"],
+                                        productName: topTrends[index]
+                                            ["product_name"],
+                                        productPrice: topTrends[index]
+                                                ["product_price"]
+                                            .toString(),
+                                        productId: topTrends[index]
+                                            ["product_id"],
+                                        isFavorite: topTrends[index]
+                                            ["is_favorite"],
+                                      ));
+                                },
+                              ),
+                            ),
+                          )
+                        : Container();
+                  },
                 ),
+
+                // Top Trends Images ListView -- End
               ],
             ),
           ),

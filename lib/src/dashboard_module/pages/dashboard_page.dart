@@ -31,7 +31,7 @@ class DashboardPage extends StatelessWidget {
           routes: [
             HomeRoute(user: s.user!),
             const CategoryRoute(),
-            const WishlistRoute(),
+            WishlistRoute(user: s.user!),
             ProfileRoute(user: s.user!),
           ],
           bottomNavigationBuilder: (_, tabsRouter) {

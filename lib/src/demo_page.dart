@@ -1,19 +1,18 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 @RoutePage()
-class TestPage extends StatelessWidget {
-  const TestPage({super.key});
+class DemoPage extends StatelessWidget {
+  const DemoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Test Page'),
+          title: const Text('Demo Page'),
           leading: IconButton(
             onPressed: () {
-              Get.back();
+              context.router.pop();
             },
             icon: const Icon(Icons.arrow_back),
           ),

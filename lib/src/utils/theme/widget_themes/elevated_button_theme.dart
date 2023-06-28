@@ -12,8 +12,8 @@ class gElevatedButtonTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       foregroundColor: gWhiteColor,
       backgroundColor: gSecondaryColor,
-      side: BorderSide(color: gSecondaryColor),
-      padding: EdgeInsets.symmetric(vertical: gButtonHeight),
+      side: const BorderSide(color: gSecondaryColor),
+      padding: const EdgeInsets.symmetric(vertical: gButtonHeight),
     ),
   );
 
@@ -23,8 +23,8 @@ class gElevatedButtonTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       foregroundColor: gSecondaryColor,
       backgroundColor: gWhiteColor,
-      side: BorderSide(color: gSecondaryColor),
-      padding: EdgeInsets.symmetric(vertical: gButtonHeight),
+      side: const BorderSide(color: gSecondaryColor),
+      padding: const EdgeInsets.symmetric(vertical: gButtonHeight),
     ),
   );
 }
