@@ -153,6 +153,8 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                     menuMaxHeight: 300,
 
                                     value: widget.initialSize,
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.black),
 
                                     // Down Arrow Icon
                                     icon: const Icon(Icons.keyboard_arrow_down),
@@ -204,6 +206,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
 
                                     value: widget.initialQuantity,
 
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.black),
+
                                     // Down Arrow Icon
                                     icon: const Icon(Icons.keyboard_arrow_down),
 
@@ -230,8 +235,48 @@ class _CardItemsCardState extends State<CardItemsCard> {
                         ),
                       ],
                     ),
-                    const Text('₹ 698 ₹4,365 84% OFF'),
-                    const Text('14 days return available'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '₹ 698 ',
+                          style: TextStyle(
+                              color: gDarkColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '₹ 4,365',
+                          style: TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '84% OFF',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xffff406c)),
+                        ),
+                      ],
+                    ),
+                    RichText(
+                      text: const TextSpan(
+                          text: '14 days',
+                          style: TextStyle(
+                              color: gDarkColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11),
+                          children: [
+                            TextSpan(
+                              text: ' return available',
+                              style: TextStyle(
+                                  fontSize: 11, fontWeight: FontWeight.normal),
+                            )
+                          ]),
+                    ),
                   ]),
             ),
           ),

@@ -25,7 +25,7 @@ class _CartPageState extends State<CartPage> {
   final _pageController = PageController(initialPage: 0);
   final _couponPageController = PageController(initialPage: 0);
 
-  bool isChecked = false;
+  bool isChecked = true;
 
   // Initial Selected Value
   String initialSize = '6';
@@ -208,90 +208,93 @@ class _CartPageState extends State<CartPage> {
               ),
 
               // Offer
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Container(
-                  width: screenSize.width,
-                  height: 155,
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 15),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/images/icons/offers.png',
-                              height: 17,
-                            ),
-                            const SizedBox(width: 5),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: RichText(
-                                text: const TextSpan(
-                                    text: 'Offers ',
-                                    style: TextStyle(
-                                        color: gDarkColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12),
-                                    children: [
-                                      TextSpan(
-                                          text: '(3)',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold))
-                                    ]),
+              Visibility(
+                visible: true,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Container(
+                    width: screenSize.width,
+                    height: 155,
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 15),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                'assets/images/icons/offers.png',
+                                height: 17,
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      //Offer Inside Container
-
-                      SizedBox(
-                        height: 95,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: 3,
-                          itemBuilder: (context, index) {
-                            return Center(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Container(
-                                  // width: screenSize.width * 0.94,
-                                  height: 105,
-                                  decoration: BoxDecoration(
-                                      // color: colorList[index],
-                                      border: Border.all(color: gGreyColor),
-                                      borderRadius: BorderRadius.circular(4)),
+                              const SizedBox(width: 5),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: RichText(
+                                  text: const TextSpan(
+                                      text: 'Offers ',
+                                      style: TextStyle(
+                                          color: gDarkColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12),
+                                      children: [
+                                        TextSpan(
+                                            text: '(3)',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold))
+                                      ]),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-
-                      //Offer Inside Container Ends
-
-                      const SizedBox(height: 10),
-
-                      Center(
-                        child: SmoothPageIndicator(
-                          controller: _pageController,
-                          count: 3,
-                          effect: const ExpandingDotsEffect(
-                            dotHeight: 5,
-                            dotWidth: 5,
-                            activeDotColor: gBlackColor,
-                            expansionFactor: 2,
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+
+                        //Offer Inside Container
+
+                        SizedBox(
+                          height: 95,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            itemCount: 3,
+                            itemBuilder: (context, index) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Container(
+                                    // width: screenSize.width * 0.94,
+                                    height: 105,
+                                    decoration: BoxDecoration(
+                                        // color: colorList[index],
+                                        border: Border.all(color: gGreyColor),
+                                        borderRadius: BorderRadius.circular(4)),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        //Offer Inside Container Ends
+
+                        const SizedBox(height: 10),
+
+                        Center(
+                          child: SmoothPageIndicator(
+                            controller: _pageController,
+                            count: 3,
+                            effect: const ExpandingDotsEffect(
+                              dotHeight: 5,
+                              dotWidth: 5,
+                              activeDotColor: gBlackColor,
+                              expansionFactor: 2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -745,6 +748,26 @@ class _CartPageState extends State<CartPage> {
                           GestureDetector(
                             onTap: () {
                               log('Know More da namme');
+                              showModalBottomSheet(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0),
+                                ),
+                                context: context,
+                                builder: (context) {
+                                  return SizedBox(
+                                    height: 200,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const <Widget>[
+                                          Text('Convenience Fee !!'),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                             },
                             child: const Icon(
                               Icons.info_outline_rounded,
