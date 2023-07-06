@@ -1,13 +1,14 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:keithel/src/dashboard_module/widgets/cart_items_card.dart';
 import 'package:keithel/src/user_module/logic/user_model.dart';
 import 'package:keithel/src/utils/theme/widget_themes/elevated_button_theme.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../core/constants/colors.dart';
+import '../widgets/cart_items_card.dart';
 
 @RoutePage()
 class CartPage extends StatefulWidget {
@@ -63,6 +64,7 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: const Color(0xfff4f4f4),
       appBar: AppBar(
@@ -363,31 +365,85 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ],
               ),
+              StreamBuilder(
+                stream:
+                    FirebaseFirestore.instance.collection("cart").snapshots(),
+                builder: (context,
+                    AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        snapshot) {
+                  if (snapshot.hasError) {
+                    print('Something went wrong');
+                  }
 
-              // Items Cards
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
-                child: CardItemsCard(
-                    initialSize: initialSize,
-                    sizes: sizes,
-                    initialQuantity: initialQuantity,
-                    quantity: quantity),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
-                child: CardItemsCard(
-                    initialSize: initialSize,
-                    sizes: sizes,
-                    initialQuantity: initialQuantity,
-                    quantity: quantity),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
-                child: CardItemsCard(
-                    initialSize: initialSize,
-                    sizes: sizes,
-                    initialQuantity: initialQuantity,
-                    quantity: quantity),
+                  final List cartItems = [];
+                  if (snapshot.hasData) {
+                    // snapshot.data!.docs
+                    //     .map((QueryDocumentSnapshot<Map<String, dynamic>>
+                    //             e) =>
+                    //         log(e.data().toString()))
+                    //     .toList();
+                    snapshot.data!.docs
+                        .map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                      Map a = e.data();
+                      // log(a.toString());
+                      cartItems.add(a);
+                    }).toList();
+                  }
+
+                  return cartItems.isNotEmpty
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: screenSize.width,
+                            child: ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: cartItems.length,
+                              itemBuilder: (context, index) {
+                                var sizes = cartItems[index]['size'] as List;
+                                var s = sizes.map((e) => e as String).toList();
+                                // return Container(
+                                //   height: 190,
+                                //   width: screenSize.width,
+                                //   color: colorList[index],
+                                // );
+                                return GestureDetector(
+                                    onTap: () {
+                                      // context.router.push(ProductRoute());
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 0, 10, 5),
+                                      child: CardItemsCard(
+                                        productId: cartItems[index]
+                                            ['product_id'],
+                                        productImagePath: cartItems[index]
+                                            ['product_image_path'],
+                                        brand: cartItems[index]['brand'],
+                                        productName: cartItems[index]
+                                            ['product_name'],
+                                        seller: cartItems[index]['seller'],
+                                        initialSize: s[0].toString(),
+                                        sizes: s,
+                                        initialQuantity: initialQuantity,
+                                        quantity: quantity,
+                                        productPrice: cartItems[index]
+                                            ['product_price'],
+                                        offerPercent: cartItems[index]
+                                            ['offer_percent'],
+                                        isReturnable: cartItems[index]
+                                            ['is_returnable'],
+                                        returnableDays: cartItems[index]
+                                            ['returnable_days'],
+                                      ),
+                                    ));
+                              },
+                            ),
+                          ),
+                        )
+                      : Container();
+                },
               ),
 
               // Gifting and Personalisation
@@ -439,13 +495,17 @@ class _CartPageState extends State<CartPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: const [
-                            Text(
-                              'Buying for a loved one ?',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            FittedBox(
+                              child: Text(
+                                'Buying for a loved one ?',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            Text(
-                              'Get wrap and personalised message on card',
-                              style: TextStyle(fontSize: 11),
+                            FittedBox(
+                              child: Text(
+                                'Get wrap and personalised message on card',
+                                style: TextStyle(fontSize: 11),
+                              ),
                             ),
                             Text(
                               'Only for ₹25',
@@ -682,124 +742,169 @@ class _CartPageState extends State<CartPage> {
                   height: 250,
                   color: Colors.white,
                   padding: const EdgeInsets.all(15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'PRICE DETAILS (3 Items)',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                      const Divider(),
-                      Row(
-                        children: const [
-                          Text(
-                            'Total MRP',
-                            style: TextStyle(fontSize: 12.5),
-                          ),
-                          Spacer(),
-                          Text(
-                            '₹ 7,354',
-                            style: TextStyle(fontSize: 12.5),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: const [
-                          Text(
-                            'Discount on MRP',
-                            style: TextStyle(fontSize: 12.5),
-                          ),
-                          Spacer(),
-                          Text(
-                            '₹ -5,060',
-                            style:
-                                TextStyle(color: Colors.green, fontSize: 12.5),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text(
-                            'Coupon Discount',
-                            style: TextStyle(fontSize: 12.5),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              log('Apply Coupon da namme');
-                            },
-                            child: const Text(
-                              'Apply Coupon',
-                              style: TextStyle(
-                                  color: Color(0xfff4456e), fontSize: 12.5),
+                  child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("cart")
+                          .snapshots(),
+                      builder: (context,
+                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                              snapshot) {
+                        if (snapshot.hasError) {
+                          print('Something went wrong');
+                        }
+
+                        final List cartItems = [];
+                        var totalMrp = 0.00;
+                        var totalDiscount = 0.00;
+
+                        if (snapshot.hasData) {
+                          snapshot.data!.docs.map(
+                              (QueryDocumentSnapshot<Map<String, dynamic>> e) {
+                            Map a = e.data();
+                            // log(a.toString());
+                            cartItems.add(a);
+                          }).toList();
+
+                          for (var index = 0;
+                              index < cartItems.length;
+                              index++) {
+                            totalMrp = totalMrp +
+                                double.parse(cartItems[index]['product_price']
+                                    .toString());
+
+                            totalDiscount = totalDiscount +
+                                double.parse((cartItems[index]
+                                            ['product_price'] *
+                                        cartItems[index]['offer_percent'] /
+                                        100)
+                                    .toString());
+                          }
+
+                          log(totalMrp.toString());
+                          log('total Discount = ${totalDiscount.toString()}');
+                        }
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'PRICE DETAILS (${cartItems.length} Items)',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 13),
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text(
-                            'Convenience Fee',
-                            style: TextStyle(fontSize: 12.5),
-                          ),
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              log('Know More da namme');
-                              showModalBottomSheet(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(0),
+                            const Divider(),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Total MRP',
+                                  style: TextStyle(fontSize: 12.5),
                                 ),
-                                context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    height: 200,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: const <Widget>[
-                                          Text('Convenience Fee !!'),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: const Icon(
-                              Icons.info_outline_rounded,
-                              color: Color(0xfff4456e),
-                              size: 20,
+                                const Spacer(),
+                                Text(
+                                  '₹ $totalMrp',
+                                  style: const TextStyle(fontSize: 12.5),
+                                )
+                              ],
                             ),
-                          ),
-                          const Spacer(),
-                          const Text(
-                            '₹10',
-                            style: TextStyle(fontSize: 12.5),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Row(
-                        children: const [
-                          Text(
-                            'Total Amount',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13),
-                          ),
-                          Spacer(),
-                          Text(
-                            '₹ 2,304',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Discount on MRP',
+                                  style: TextStyle(fontSize: 12.5),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '₹ -${totalDiscount.toString()}',
+                                  style: const TextStyle(
+                                      color: Colors.green, fontSize: 12.5),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Coupon Discount',
+                                  style: TextStyle(fontSize: 12.5),
+                                ),
+                                const Spacer(),
+                                GestureDetector(
+                                  onTap: () {
+                                    log('Apply Coupon da namme');
+                                  },
+                                  child: const Text(
+                                    'Apply Coupon',
+                                    style: TextStyle(
+                                        color: Color(0xfff4456e),
+                                        fontSize: 12.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Convenience Fee',
+                                  style: TextStyle(fontSize: 12.5),
+                                ),
+                                const SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    log('Know More da namme');
+                                    showModalBottomSheet(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(0),
+                                      ),
+                                      context: context,
+                                      builder: (context) {
+                                        return SizedBox(
+                                          height: 200,
+                                          child: Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const <Widget>[
+                                                Text('Convenience Fee !!'),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.info_outline_rounded,
+                                    color: Color(0xfff4456e),
+                                    size: 20,
+                                  ),
+                                ),
+                                const Spacer(),
+                                const Text(
+                                  '₹10',
+                                  style: TextStyle(fontSize: 12.5),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Total Amount',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '₹ ${(totalMrp - totalDiscount).toString()}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13),
+                                )
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
                 ),
               ),
 
