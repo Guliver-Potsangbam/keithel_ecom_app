@@ -131,10 +131,12 @@ class _WishlistItemsCardState extends State<WishlistItemsCard> {
                           DocumentReference cartDocsRef = cartItemsCollection
                               .doc(widget.wishlist[widget.index]['product_id']);
 
-                          cartDocsRef.set(widget.wishlist[widget.index]).then(
-                              (value) => cartDocsRef.update({
-                                    'selected_size':
-                                        widget.wishlist[widget.index]['size'][0]
+                          cartDocsRef
+                              .set(widget.wishlist[widget.index])
+                              .then((value) => cartDocsRef.update({
+                                    'selected_size': widget
+                                        .wishlist[widget.index]['size'][0],
+                                    'selected_quantity': num.parse(1.toString())
                                   }));
 
                           isAddedToCart = true;
@@ -142,7 +144,7 @@ class _WishlistItemsCardState extends State<WishlistItemsCard> {
                           // context.router
                           //     .push(CartRoute(user: user));
 
-                          Future.delayed(const Duration(seconds: 2), () async {
+                          Future.delayed(const Duration(seconds: 0), () async {
                             try {
                               await FirebaseFirestore.instance
                                   .collection('products')
@@ -161,12 +163,14 @@ class _WishlistItemsCardState extends State<WishlistItemsCard> {
                           padding:
                               const MaterialStatePropertyAll(EdgeInsets.zero),
                         ),
-                        child: isAddedToCart
-                            ? const Icon(Icons.done)
-                            : const Text(
-                                "ADD TO CART",
-                                style: TextStyle(fontSize: 12),
-                              ),
+                        child:
+                            // isAddedToCart
+                            //     ? const Icon(Icons.done)
+                            //     :
+                            const Text(
+                          "ADD TO CART",
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                     )
                   ],

@@ -37,7 +37,13 @@ class ShowAllPage extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () => context.router.push(ProductRoute()),
+            onTap: () => context.router.push(ProductRoute(
+                brand: itemList[index]["brand"],
+                discription:
+                    'This is the descroiption part of the item. Just a sample !',
+                imageUrl: itemList[index]["product_image_path"],
+                name: itemList[index]["product_name"],
+                price: itemList[index]["product_price"].toString())),
             child: Center(
               child: ProductCard(
                   productImagePath: itemList[index]['product_image_path'],

@@ -9,6 +9,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i19;
+import 'package:flutter/cupertino.dart' as _i22;
 import 'package:flutter/material.dart' as _i20;
 import 'package:keithel/src/core/authflow_page.dart' as _i1;
 import 'package:keithel/src/dashboard_module/pages/cart_page.dart' as _i18;
@@ -66,11 +67,17 @@ abstract class $AppRouter extends _i19.RootStackRouter {
       );
     },
     ProductRoute.name: (routeData) {
-      final args = routeData.argsAs<ProductRouteArgs>(
-          orElse: () => const ProductRouteArgs());
+      final args = routeData.argsAs<ProductRouteArgs>();
       return _i19.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i5.ProductPage(key: args.key),
+        child: _i5.ProductPage(
+          key: args.key,
+          name: args.name,
+          brand: args.brand,
+          discription: args.discription,
+          price: args.price,
+          imageUrl: args.imageUrl,
+        ),
       );
     },
     ProfileRoute.name: (routeData) {
@@ -260,11 +267,23 @@ class HomeRouteArgs {
 /// [_i5.ProductPage]
 class ProductRoute extends _i19.PageRouteInfo<ProductRouteArgs> {
   ProductRoute({
-    _i20.Key? key,
+    _i22.Key? key,
+    required String name,
+    required String brand,
+    required String discription,
+    required String price,
+    required String imageUrl,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           ProductRoute.name,
-          args: ProductRouteArgs(key: key),
+          args: ProductRouteArgs(
+            key: key,
+            name: name,
+            brand: brand,
+            discription: discription,
+            price: price,
+            imageUrl: imageUrl,
+          ),
           initialChildren: children,
         );
 
@@ -275,13 +294,30 @@ class ProductRoute extends _i19.PageRouteInfo<ProductRouteArgs> {
 }
 
 class ProductRouteArgs {
-  const ProductRouteArgs({this.key});
+  const ProductRouteArgs({
+    this.key,
+    required this.name,
+    required this.brand,
+    required this.discription,
+    required this.price,
+    required this.imageUrl,
+  });
 
-  final _i20.Key? key;
+  final _i22.Key? key;
+
+  final String name;
+
+  final String brand;
+
+  final String discription;
+
+  final String price;
+
+  final String imageUrl;
 
   @override
   String toString() {
-    return 'ProductRouteArgs{key: $key}';
+    return 'ProductRouteArgs{key: $key, name: $name, brand: $brand, discription: $discription, price: $price, imageUrl: $imageUrl}';
   }
 }
 

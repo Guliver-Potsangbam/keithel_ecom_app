@@ -43,9 +43,7 @@ class _AuthFlowPageState extends State<AuthFlowPage> {
           case Status.login:
             return [const DashboardRoute()];
           case Status.logout:
-            return isOnboardViewed == 1
-                ? [const WelcomeRoute()]
-                : [OnBoardingRoute()];
+            return [const WelcomeRoute()];
         }
       },
     );

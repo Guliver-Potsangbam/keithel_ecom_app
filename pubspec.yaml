@@ -101,6 +101,7 @@ flutter:
     - assets/images/homepage/
     - assets/images/empty/empty_wishlist.png
     - assets/images/icons/
+    - assets/images/lottie/cart/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

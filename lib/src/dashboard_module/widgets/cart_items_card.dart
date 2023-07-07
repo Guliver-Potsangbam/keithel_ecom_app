@@ -13,10 +13,10 @@ import '../../core/constants/colors.dart';
 class CardItemsCard extends StatefulWidget {
   CardItemsCard({
     super.key,
-    required this.initialSize,
-    required this.sizes,
-    required this.initialQuantity,
-    required this.quantity,
+    required this.availableSizes,
+    required this.selectedSize,
+    required this.availableQuantities,
+    required this.selectedQuantity,
     required this.brand,
     required this.productName,
     required this.seller,
@@ -26,19 +26,26 @@ class CardItemsCard extends StatefulWidget {
     required this.returnableDays,
     required this.productImagePath,
     required this.productId,
+    required this.delFunc,
   });
+
   final String productImagePath;
   final String brand;
   final String productName;
   final String seller;
-  late String initialSize;
-  final List<String> sizes;
-  late String initialQuantity;
-  final List<String> quantity;
-  final int productPrice;
-  final int offerPercent;
+
+  final Function delFunc;
+
+  final List<String> availableSizes;
+  String selectedSize;
+
+  final List<num> availableQuantities;
+  num selectedQuantity;
+
+  final num productPrice;
+  final num offerPercent;
   final bool isReturnable;
-  final int returnableDays;
+  final num returnableDays;
   final String productId;
 
   @override
@@ -62,8 +69,6 @@ class _CardItemsCardState extends State<CardItemsCard> {
     }
   }
 
-  int tabIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -84,6 +89,8 @@ class _CardItemsCardState extends State<CardItemsCard> {
             flex: 5,
             child: Stack(
               children: [
+                // Product Image Area
+
                 Container(
                   padding: const EdgeInsets.all(5),
                   color: const Color(0xfffff2ec),
@@ -94,15 +101,15 @@ class _CardItemsCardState extends State<CardItemsCard> {
                     height: 150,
                   ),
                 ),
-                Positioned(
-                  left: -8,
-                  top: -8,
-                  child: Container(
-                    color: Colors.white,
-                    height: 10,
-                    width: 10,
-                  ),
-                ),
+                // Positioned(
+                //   left: -8,
+                //   top: -8,
+                //   child: Container(
+                //     color: Colors.white,
+                //     height: 10,
+                //     width: 10,
+                //   ),
+                // ),
                 Positioned(
                   left: -7,
                   top: -7,
@@ -135,6 +142,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
               ],
             ),
           ),
+
+          // Text Area
+
           Expanded(
             flex: 9,
             child: Padding(
@@ -166,6 +176,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                 ),
                                 context: context,
                                 builder: (context) {
+                                  int tabIndex = widget.availableSizes
+                                      .indexOf(widget.selectedSize);
+
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return SizedBox(
@@ -190,7 +203,8 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                               // color: Colors.green,
                                               width: screenSize.width,
                                               child: ListView.builder(
-                                                itemCount: widget.sizes.length,
+                                                itemCount: widget
+                                                    .availableSizes.length,
                                                 scrollDirection:
                                                     Axis.horizontal,
                                                 shrinkWrap: true,
@@ -205,11 +219,12 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                                     child: GestureDetector(
                                                       onTap: () {
                                                         setState(() {
-                                                          widget.initialSize =
-                                                              widget
-                                                                  .sizes[index];
+                                                          widget.selectedSize =
+                                                              widget.availableSizes[
+                                                                  index];
                                                           tabIndex = index;
-                                                          log(widget.initialSize
+                                                          log(widget
+                                                              .selectedSize
                                                               .toString());
                                                           // context.router.pop();
                                                         });
@@ -230,7 +245,8 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                                                 .circle),
                                                         child: Center(
                                                             child: Text(
-                                                          widget.sizes[index],
+                                                          widget.availableSizes[
+                                                              index],
                                                           style: TextStyle(
                                                             color: index ==
                                                                     tabIndex
@@ -246,14 +262,16 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                             ),
                                             GestureDetector(
                                               onTap: () async {
+                                                // ignore: use_build_context_synchronously
+                                                context.router.pop();
+
                                                 await FirebaseFirestore.instance
                                                     .collection('cart')
                                                     .doc(widget.productId)
                                                     .update({
                                                   'selected_size':
-                                                      widget.initialSize
-                                                }).then((value) =>
-                                                        context.router.pop());
+                                                      widget.selectedSize
+                                                });
                                               },
                                               child: Container(
                                                 height: 37,
@@ -275,6 +293,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                 },
                               );
                             },
+
+                            // Size Small Grey Container
+
                             child: Container(
                               padding: EdgeInsets.zero,
                               height: 25,
@@ -288,7 +309,7 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('Size:  ${widget.initialSize}'),
+                                    Text('Size:  ${widget.selectedSize}'),
                                     const Icon(Icons.arrow_drop_down_outlined)
                                   ],
                                 ),
@@ -298,7 +319,7 @@ class _CardItemsCardState extends State<CardItemsCard> {
                         ),
                         const SizedBox(width: 15),
 
-                        //Quantity of items
+                        //  Quantity of items
 
                         Expanded(
                           child: GestureDetector(
@@ -309,37 +330,132 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                 ),
                                 context: context,
                                 builder: (context) {
-                                  return SizedBox(
-                                    height: 150,
-                                    width: screenSize.width,
-                                    child: ListView.builder(
-                                      itemCount: widget.quantity.length,
-                                      scrollDirection: Axis.horizontal,
-                                      shrinkWrap: true,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0, 10, 10, 10),
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.black),
-                                                shape: BoxShape.circle),
-                                            child: Center(
-                                                child: Text(
-                                                    widget.quantity[index])),
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                  int tabIndex = widget.availableQuantities
+                                      .indexOf(widget.selectedQuantity);
+                                  log(tabIndex.toString());
+
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return SizedBox(
+                                        height: 140,
+                                        width: screenSize.width,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 15, top: 10),
+                                              child: Text(
+                                                'Select Quantity',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 75,
+                                              // color: Colors.green,
+                                              width: screenSize.width,
+                                              child: ListView.builder(
+                                                itemCount: widget
+                                                    .availableQuantities.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                shrinkWrap: true,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 3, 15, 7),
+                                                itemBuilder: (context, index) {
+                                                  log(widget.availableQuantities
+                                                      .length
+                                                      .toString());
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 5),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          widget.selectedQuantity =
+                                                              widget.availableQuantities[
+                                                                  index];
+                                                          tabIndex = index;
+                                                          // log(widget
+                                                          //     .initialSize
+                                                          //     .toString());
+                                                          // context.router.pop();
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        decoration: BoxDecoration(
+                                                            color: index ==
+                                                                    tabIndex
+                                                                ? Colors.black
+                                                                : Colors
+                                                                    .transparent,
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .black),
+                                                            shape: BoxShape
+                                                                .circle),
+                                                        child: Center(
+                                                            child: Text(
+                                                          widget
+                                                              .availableQuantities[
+                                                                  index]
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: index ==
+                                                                    tabIndex
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                          ),
+                                                        )),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () async {
+                                                // ignore: use_build_context_synchronously
+                                                context.router.pop();
+
+                                                await FirebaseFirestore.instance
+                                                    .collection('cart')
+                                                    .doc(widget.productId)
+                                                    .update({
+                                                  'selected_quantity':
+                                                      widget.selectedQuantity
+                                                });
+                                              },
+                                              child: Container(
+                                                height: 37,
+                                                width: screenSize.width,
+                                                color: const Color(0xfff4456e),
+                                                child: const Center(
+                                                    child: Text(
+                                                  'Done',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                )),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               );
                             },
+
+                            // Size Small Grey Container
+
                             child: Container(
                               padding: EdgeInsets.zero,
                               height: 25,
@@ -352,41 +468,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                     const EdgeInsets.symmetric(horizontal: 5),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text('Qty:  1'),
-                                    Icon(Icons.arrow_drop_down_outlined)
-                                    // DropdownButton(
-                                    //   iconSize: 20,
-
-                                    //   alignment: Alignment.centerRight,
-                                    //   underline:
-                                    //       Container(color: Colors.transparent),
-                                    //   menuMaxHeight: 300,
-
-                                    //   value: widget.initialQuantity,
-
-                                    //   style: const TextStyle(
-                                    //       fontSize: 14, color: Colors.black),
-
-                                    //   // Down Arrow Icon
-                                    //   icon: const Icon(Icons.keyboard_arrow_down),
-
-                                    //   // Array list of items
-                                    //   items:
-                                    //       widget.quantity.map((String quantity) {
-                                    //     return DropdownMenuItem(
-                                    //       value: quantity,
-                                    //       child: Text(quantity),
-                                    //     );
-                                    //   }).toList(),
-                                    //   // After selecting the desired option,it will
-                                    //   // change button value to selected value
-                                    //   onChanged: (String? newValue) {
-                                    //     setState(() {
-                                    //       widget.initialQuantity = newValue!;
-                                    //     });
-                                    //   },
-                                    // )
+                                  children: [
+                                    Text('Qty:  ${widget.selectedQuantity}'),
+                                    const Icon(Icons.arrow_drop_down_outlined)
                                   ],
                                 ),
                               ),
@@ -403,7 +487,7 @@ class _CardItemsCardState extends State<CardItemsCard> {
                           child: Row(
                             children: [
                               Text(
-                                '₹ ${(double.parse(widget.initialQuantity) * (widget.productPrice - widget.productPrice * widget.offerPercent / 100)).toStringAsFixed(2)}',
+                                '₹ ${(widget.selectedQuantity * (widget.productPrice - widget.productPrice * widget.offerPercent / 100)).toStringAsFixed(2)}',
                                 style: const TextStyle(
                                     color: gDarkColor,
                                     fontWeight: FontWeight.bold,
@@ -413,8 +497,10 @@ class _CardItemsCardState extends State<CardItemsCard> {
                             ],
                           ),
                         ),
+
+                        // MRP - Original Price
                         Text(
-                          '₹ ${widget.productPrice * int.parse(widget.initialQuantity)}',
+                          '₹ ${widget.productPrice * widget.selectedQuantity}',
                           style: TextStyle(
                               decoration: widget.offerPercent == 0
                                   ? TextDecoration.none
@@ -425,7 +511,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
                                   ? Colors.black
                                   : Colors.grey),
                         ),
+
                         const SizedBox(width: 10),
+
                         Visibility(
                           visible: widget.offerPercent == 0 ? false : true,
                           child: Text(
@@ -466,11 +554,9 @@ class _CardItemsCardState extends State<CardItemsCard> {
             child: GestureDetector(
                 onTap: () async {
                   log('card kak a');
-                  log(widget.productId);
-                  await FirebaseFirestore.instance
-                      .collection("cart")
-                      .doc(widget.productId)
-                      .delete();
+                  log('${widget.productId} --- ${widget.productName}');
+
+                  widget.delFunc();
                 },
                 child: const Icon(Icons.close, size: 17)),
           ),

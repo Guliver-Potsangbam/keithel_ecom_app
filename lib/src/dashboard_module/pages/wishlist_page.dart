@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:keithel/src/core/constants/colors.dart';
 import 'package:keithel/src/core/router/app_route.gr.dart';
 
-import 'package:badges/badges.dart' as badges;
+import 'package:keithel/src/dashboard_module/widgets/badge_noti_no.dart';
+import 'package:keithel/src/dashboard_module/widgets/badge_cart_no.dart';
 
 import '../../sidebar_module/pages/sidebar.dart';
 import '../../user_module/logic/user_model.dart';
@@ -17,8 +18,6 @@ class WishlistPage extends StatelessWidget {
   WishlistPage({super.key, required this.user});
 
   final UserModel user;
-
-  List fakeList = ['Tomba', 'Chaoba', 'Gulu'];
 
   final colors = const [
     Colors.red,
@@ -53,50 +52,10 @@ class WishlistPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // My Cart Action Button
-                badges.Badge(
-                  position: badges.BadgePosition.topEnd(top: 3, end: 7),
-                  badgeStyle: badges.BadgeStyle(
-                    badgeColor: gBadgeColor,
-                    padding: const EdgeInsets.all(5),
-                    borderRadius: BorderRadius.circular(4),
-                    elevation: 0,
-                  ),
-                  badgeContent: const Text(
-                    '3',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      context.router.push(CartRoute(user: user));
-                    },
-                    icon: const Icon(
-                      Icons.shopping_cart,
-                      size: 20.0,
-                    ),
-                  ),
-                ),
+                BadgeCartNo(user: user),
 
                 // Notification Action Button
-                badges.Badge(
-                  position: badges.BadgePosition.topEnd(top: 3, end: 7),
-                  badgeStyle: badges.BadgeStyle(
-                    badgeColor: gBadgeColor,
-                    padding: const EdgeInsets.all(5),
-                    borderRadius: BorderRadius.circular(4),
-                    elevation: 0,
-                  ),
-                  badgeContent: const Text(
-                    '2',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.notifications,
-                      size: 20.0,
-                    ),
-                  ),
-                ),
+                const BadgeNotiNo(),
               ],
             ),
           ),
@@ -201,7 +160,9 @@ class WishlistPage extends StatelessWidget {
                                   style: const ButtonStyle(
                                       padding: MaterialStatePropertyAll(
                                           EdgeInsets.zero)),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    context.router.push(HomeRoute(user: user));
+                                  },
                                   child: const Text(
                                     'Add Now',
                                   )),

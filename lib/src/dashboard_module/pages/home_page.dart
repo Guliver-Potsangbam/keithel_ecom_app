@@ -321,7 +321,20 @@ class _HomePageState extends State<HomePage> {
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                       onTap: () {
-                                        context.router.push(ProductRoute());
+                                        context.router.push(
+                                          ProductRoute(
+                                              brand: recentlyViewed[index]
+                                                  ["brand"],
+                                              discription:
+                                                  'This is the descroiption part of the item. Just a sample !',
+                                              imageUrl: recentlyViewed[index]
+                                                  ["product_image_path"],
+                                              name: recentlyViewed[index]
+                                                  ["product_name"],
+                                              price: recentlyViewed[index]
+                                                      ["product_price"]
+                                                  .toString()),
+                                        );
                                       },
                                       child: ProductCard(
                                         productImagePath: recentlyViewed[index]
@@ -439,7 +452,17 @@ class _HomePageState extends State<HomePage> {
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                       onTap: () {
-                                        context.router.push(ProductRoute());
+                                        context.router.push(ProductRoute(
+                                            brand: newArrivals[index]["brand"],
+                                            discription:
+                                                'This is the descroiption part of the item. Just a sample !',
+                                            imageUrl: newArrivals[index]
+                                                ["product_image_path"],
+                                            name: newArrivals[index]
+                                                ["product_name"],
+                                            price: newArrivals[index]
+                                                    ["product_price"]
+                                                .toString()));
                                       },
                                       child: ProductCard(
                                         productImagePath: newArrivals[index]
@@ -556,7 +579,17 @@ class _HomePageState extends State<HomePage> {
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                       onTap: () {
-                                        context.router.push(ProductRoute());
+                                        context.router.push(ProductRoute(
+                                            brand: topTrends[index]["brand"],
+                                            discription:
+                                                'This is the descroiption part of the item. Just a sample !',
+                                            imageUrl: topTrends[index]
+                                                ["product_image_path"],
+                                            name: topTrends[index]
+                                                ["product_name"],
+                                            price: topTrends[index]
+                                                    ["product_price"]
+                                                .toString()));
                                       },
                                       child: ProductCard(
                                         productImagePath: topTrends[index]

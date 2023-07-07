@@ -2,11 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:keithel/src/core/constants/colors.dart';
 import 'package:keithel/src/core/constants/image_strings.dart';
 import 'package:keithel/src/core/constants/sizes.dart';
 import 'package:keithel/src/core/router/app_route.gr.dart';
-import 'package:keithel/src/user_module/pages/user_management_page.dart';
 import 'package:keithel/src/utils/theme/theme.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import '../../core/constants/text_strings.dart';
@@ -69,12 +67,12 @@ class ProfilePage extends StatelessWidget {
                       height: 35,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
-                        color: gPrimaryColor,
+                        color: const Color(0xfff4456e),
                       ),
                       child: const Icon(
                         LineAwesomeIcons.alternate_pencil,
                         size: 20.0,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
                   )
@@ -97,13 +95,13 @@ class ProfilePage extends StatelessWidget {
                     context.router.push(const UpdateProfileRoute());
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: gPrimaryColor,
+                    backgroundColor: const Color(0xfff4456e),
                     side: BorderSide.none,
                     shape: const StadiumBorder(),
                   ),
                   child: const Text(
                     gEditProfile,
-                    style: TextStyle(color: gDarkColor),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -121,15 +119,22 @@ class ProfilePage extends StatelessWidget {
                 onPress: () {},
               ),
               ProfileMenuWidget(
-                title: gMenu2,
+                title: 'Your Orders',
                 icon: LineAwesomeIcons.box,
                 onPress: () {},
               ),
               ProfileMenuWidget(
-                title: gMenu3,
-                icon: LineAwesomeIcons.user,
+                title: 'About',
+                icon: LineAwesomeIcons.info_circle,
                 onPress: () {
-                  Get.to(() => const UserManagementPage());
+                  // Get.to(() => const UserManagementPage());
+                },
+              ),
+              ProfileMenuWidget(
+                title: 'Feedback',
+                icon: LineAwesomeIcons.comment,
+                onPress: () {
+                  // Get.to(() => const UserManagementPage());
                 },
               ),
 
@@ -144,7 +149,7 @@ class ProfilePage extends StatelessWidget {
               ),
               ProfileMenuWidget(
                 title: gMenu5,
-                textColor: Colors.red,
+                textColor: const Color(0xfff4456e),
                 isEndIcon: false,
                 icon: LineAwesomeIcons.alternate_sign_out,
                 onPress: () async {
